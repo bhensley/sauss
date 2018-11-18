@@ -53,16 +53,13 @@ class UrlShortener
 	 * @param   PDO Resource    $dbResource
 	 * @param   integer         $sid
 	 */
-	public function __construct ($dbResource, $sid = null)
-	{
+	public function __construct ($dbResource, $sid = null) {
 		$this->_db  = $dbResource;
 		
-		if ($sid != null)
-		{
+		if ($sid != null) {
 			$this->_sid = $this->clean_sid ($sid);
 			
-			if (!$this->_targetUrl = $this->validate_sid ())
-			{
+			if (!$this->_targetUrl = $this->validate_sid ()) {
 				throw new UrlShortenerException ("Invalid SID given.");
 			}
 		}
@@ -74,27 +71,22 @@ class UrlShortener
 	 *
 	 * @access  public
 	 */
-	public function send_user_to_url ()
-	{
-		if (strlen ($this->_targetUrl) > 0)
-		{
+	public function send_user_to_url () {
+		if (strlen ($this->_targetUrl) > 0)	{
 			$sql = $this->_db->prepare ("SELECT COUNT(*), number_of_visits FROM statistics WHERE sid = :target");
 			$sql->bindValue (":target", $this->_sid);
 			$sql->execute ();
 			
 			$resultSet = $sql->fetchAll ();
 
-			if (count ($resultSet) > 0 && $resultSet[0][0] == 1)
-			{
+			if (count ($resultSet) > 0 && $resultSet[0][0] == 1) {
 				$newVisited = ++$resultSet[0][1];
 				
 				$sql = $this->_db->prepare ("UPDATE statistics SET number_of_visits = :num WHERE sid = :target");
 				$sql->bindValue (":num", $newVisited);
 				$sql->bindValue (":target", $this->_sid);
 				$sql->execute ();
-			}
-			else
-			{
+			} else {
 				$sql = $this->_db->prepare ("INSERT INTO statistics (sid, created_at, last_accessed_at, number_of_visits) VALUES (:sid, NOW(), NOW(), 1)");
 				$sql->bindValue (":sid", $this->_sid);
 				$sql->execute ();
@@ -122,20 +114,18 @@ class UrlShortener
 	 *        and return an appropriate array.  New statistics could then be added
 	 *        with ease and without need to modify this class.
 	 */
-	public function get_sid_data ()
-	{
+	public function get_sid_data () {
 		$sql = $this->_db->prepare ("SELECT COUNT(*), last_accessed_at, number_of_visits FROM statistics WHERE sid = :target");
 		$sql->bindValue (":target", "dsa323rf");
-	  $sql->execute ();
-	  
-	  $resultSet = $sql->fetchAll ();
-	  
-	  if (count ($resultSet) > 0 && $resultSet[0][0] == 1)
-	  {
-	  	return array ($resultSet[0][1], $resultSet[0][2], $this->_targetUrl);
-	  }
-	  
-	  throw new UrlShortenerException ("Could not find the statistics for the given SID.");
+		$sql->execute ();
+
+		$resultSet = $sql->fetchAll ();
+
+		if (count ($resultSet) > 0 && $resultSet[0][0] == 1) {
+			return array ($resultSet[0][1], $resultSet[0][2], $this->_targetUrl);
+		}
+
+		throw new UrlShortenerException ("Could not find the statistics for the given SID.");
 	}
 	
 	/**
@@ -145,11 +135,9 @@ class UrlShortener
 	 * @param   string    $target The URL the redirect represents
 	 * @return  integer   The new SID
 	 */
-	public function create_new_redirect ($target)
-	{
+	public function create_new_redirect ($target) {
 		// Clean URL?
-		if (!preg_match ("/^[http:\/\/]*[www\.]*[a-z0-9\-]{3,}\.[a-z]{2,4}.*$/i", $target))
-		{
+		if (!preg_match ("/^[http:\/\/]*[www\.]*[a-z0-9\-]{3,}\.[a-z]{2,4}.*$/i", $target)) {
 			throw new UrlShortenerException ("Invalid URL given.");
 		}
 				
@@ -160,24 +148,17 @@ class UrlShortener
 		
 		$resultSet = $sql->fetchAll ();
 		
-		if (count ($resultSet) > 0 && $resultSet[0][0] == 1)
-		{
+		if (count ($resultSet) > 0 && $resultSet[0][0] == 1) {
 			// Found an pre existing SID, return it.
 			return $resultSet[0][1];
-		}
-		else
-		{
+		} else {
 			$this->_sid = $this->generate_rand_string ();
 			$foundSid = false;
 			
-			while (!$foundSid)
-			{
-				if ($this->validate_sid ())
-				{
+			while (!$foundSid) {
+				if ($this->validate_sid ()) {
 					$this->_sid = $this->generate_rand_string ();
-				}
-				else
-				{
+				} else {
 					$foundSid = true;
 				}
 			}
@@ -187,11 +168,8 @@ class UrlShortener
 			$sql->bindValue (":sid", $this->_sid, PDO::PARAM_STR);
 			$sql->bindValue (":url", $target, PDO::PARAM_STR);
 			$sql->execute ();
-
-			echo $sql->debugDumpParams();
 			
-			if ($sql->rowCount () == 0)
-			{
+			if ($sql->rowCount () == 0) {
 				throw new UrlShortenerException ("Failed to register the new redirect.");
 			}
 			
@@ -206,21 +184,19 @@ class UrlShortener
 	 * @return  string    The URL the valid SID represents.
 	 * @return  boolean   Could not  find the SID in the database, return false.
 	 */
-	private function validate_sid ()
-	{
-    $sql = $this->_db->prepare ("SELECT COUNT(*), url FROM shortened_urls WHERE sid = :target");
-    $sql->bindValue (":target", $this->_sid);
-    $sql->execute ();
+	private function validate_sid () {
+	    $sql = $this->_db->prepare ("SELECT COUNT(*), url FROM shortened_urls WHERE sid = :target");
+	    $sql->bindValue (":target", $this->_sid);
+	    $sql->execute ();
 
-    $resultSet = $sql->fetchAll ();
-    
-    // Check to see if we found a URL
-    if (count ($resultSet) > 0 && $resultSet[0][0] == 1)
-    {
-      return $resultSet[0][1];
-    }
-    
-    return false;
+	    $resultSet = $sql->fetchAll ();
+	    
+	    // Check to see if we found a URL
+	    if (count ($resultSet) > 0 && $resultSet[0][0] == 1) {
+			return $resultSet[0][1];
+	    }
+	    
+	    return false;
 	}
 
 	/**
@@ -229,13 +205,11 @@ class UrlShortener
 	 * @access  private
 	 * @return  string    New random SID.
 	 */
-	private function generate_rand_string ()
-	{
+	private function generate_rand_string () {
 		$chars = "abcdefghijklmnopqrstuvwxyz1234567890";
 		$tmpString = "";
 		
-		while (strlen ($tmpString) < 8)
-		{
+		while (strlen ($tmpString) < 8) {
 			$rand = mt_rand (0, (strlen ($chars) - 1));
 			$tmpString .= substr ($chars, $rand, 1);
 		}
@@ -251,12 +225,9 @@ class UrlShortener
 	 * @param   string    The SID to check.
 	 * @return  string    The SID checked out.
 	 */
-	private function clean_sid ($sid)
-	{
-		if (preg_match ("/^[a-z0-9]+(!{0,1})$/i", $sid, $matches))
-		{
-			if ($matches[1] == "!")
-			{
+	private function clean_sid ($sid) {
+		if (preg_match ("/^[a-z0-9]+(!{0,1})$/i", $sid, $matches)) {
+			if ($matches[1] == "!") {
 				$this->_stats = true;
 				$sid = substr ($sid, 0, (strlen ($sid) - 1));
 			}
