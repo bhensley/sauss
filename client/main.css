@@ -1,0 +1,78 @@
+@CHARSET "UTF-8";
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td
+{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+
+body
+{
+  background-image: url('images/background.png');
+  background-repeat: repeat;
+  text-align: center;
+  font-family: Verdana, sans-serif;
+}
+
+#container
+{
+  border: 2px solid #000;
+  margin: auto;
+  margin-top: 10em;
+  width: 40em;
+  height: 10em;
+  text-align: left;
+}
+
+#content
+{
+  text-align: center;
+}
+
+input.text
+{
+  height: 1.5em;
+  font-size: 30pt;
+  padding: 0;
+  margin-top: 1.05em;
+  font-family: Verdana, sans-serif;  
+}
+
+.stats, .new-redirect, .error
+{
+  font-size: 14pt;
+  height: 100%;
+  width: 100%;
+}
+
+.stats span, .new-redirect span
+{
+  display: block;
+  position: relative;
+  line-height: 2.8em;
+}
+
+.error span
+{
+  display: block;
+  position: relative;
+  line-height: 4em;
+}
+
+.new-redirect .url
+{
+  font-size: 20pt;
+}
