@@ -116,7 +116,7 @@ class UrlShortener
 	 */
 	public function get_sid_data () {
 		$sql = $this->_db->prepare ("SELECT COUNT(*), last_accessed_at, number_of_visits FROM statistics WHERE sid = :target");
-		$sql->bindValue (":target", "dsa323rf");
+		$sql->bindValue (":target", $this->_sid);
 		$sql->execute ();
 
 		$resultSet = $sql->fetchAll ();
